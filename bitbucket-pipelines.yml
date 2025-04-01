@@ -5,7 +5,7 @@ pipelines:
     - step: &github-mirror-branch
         name: Mirror to Github
         script:
-          - git fetch --unshallow origin
+          - git fetch origin
           - git remote add github https://x-token-auth:${GITHUB_TOKEN}@github.com/wimwenigerkind/satisfactory-server-docker.git
           - git push --force github ${BITBUCKET_BRANCH}
     -   step: &build-and-push-docker-image
