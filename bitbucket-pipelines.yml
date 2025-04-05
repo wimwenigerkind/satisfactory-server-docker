@@ -1,7 +1,20 @@
-image: heptacom/shopware-6-plugin-pipeline:php83-node20-latest
+image: docker:24.0.7
 
 pipelines:
   default:
+    - step: &build-and-push-docker-image
+        runs-on:
+          - docker.prod.02
+        name: Build and push docker image to Docker Hub
+        image: docker:24.0.7
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          - docker build -t "$DOCKER_USERNAME/satisfactory-server-docker:latest" .
+          - docker push "$DOCKER_USERNAME/satisfactory-server-docker:latest"
     - step: &github-mirror-branch
         runs-on:
           - docker.prod.02
@@ -10,16 +23,8 @@ pipelines:
           - git fetch origin
           - git remote add github https://x-token-auth:${GITHUB_TOKEN}@github.com/wimwenigerkind/satisfactory-server-docker.git
           - git push --force github ${BITBUCKET_BRANCH}
-    - step: &build-and-push-docker-image
-        runs-on:
-          - docker.prod.02
-        name: Build and push docker image to Docker Hub
-        caches:
-          - docker
-        services:
-          - docker
-        image: debian:bookworm-slim
-        script:
-          - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-          - docker build -t "${DOCKER_USERNAME}/satisfactory-server-docker:latest" .
-          - docker push "${DOCKER_USERNAME}/satisfactory-server-docker:latest"
+definitions:
+  services:
+    docker:
+      image: docker:24.0.7-dind
+      privileged: true
