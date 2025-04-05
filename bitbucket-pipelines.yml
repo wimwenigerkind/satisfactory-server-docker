@@ -4,8 +4,7 @@ pipelines:
   default:
     - step: &github-mirror-branch
         runs-on:
-          - 'self.hosted'
-          - 'workspace'
+          - docker.prod.02
         name: Mirror to Github
         script:
           - git fetch origin
@@ -13,8 +12,7 @@ pipelines:
           - git push --force github ${BITBUCKET_BRANCH}
     - step: &build-and-push-docker-image
         runs-on:
-          - 'self.hosted'
-          - 'workspace'
+          - docker.prod.02
         name: Build and push docker image to Docker Hub
         caches:
           - docker
