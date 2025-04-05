@@ -3,12 +3,18 @@ image: heptacom/shopware-6-plugin-pipeline:php83-node20-latest
 pipelines:
   default:
     - step: &github-mirror-branch
+        runs-on:
+          - 'self.hosted'
+          - 'workspace'
         name: Mirror to Github
         script:
           - git fetch origin
           - git remote add github https://x-token-auth:${GITHUB_TOKEN}@github.com/wimwenigerkind/satisfactory-server-docker.git
           - git push --force github ${BITBUCKET_BRANCH}
     - step: &build-and-push-docker-image
+        runs-on:
+          - 'self.hosted'
+          - 'workspace'
         name: Build and push docker image to Docker Hub
         caches:
           - docker
